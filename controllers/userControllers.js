@@ -25,8 +25,6 @@ module.exports.register = (data) => {
 			})
 		}
 	})
-
-
 	
 }
 
@@ -55,4 +53,17 @@ module.exports.getAllUsers = () => {
 	}).catch(err => {
 		return false
 	})
+}
+
+
+module.exports.setAsAdmin = async (id) => {
+
+	try {
+		let result = await User.findByIdAndUpdate({_id : id}, {isAdmin : true})
+		
+		return true
+	}catch(err) {
+		return false
+	}
+
 }

@@ -28,12 +28,25 @@ router.post('/login', (req,res)=> {
 	})
 })
 
+
+
+//ADMIN Protected Routes
 router.get('/details/all', auth.verify, auth.verifyAdmin, (req,res)=> {
 	userControllers.getAllUsers().then(result => {
 		if(result) {
 			res.send(result)
 		} else {
 			res.send("ERROR")
+		}
+	})
+})
+
+router.put('/:id/setAsAdmin', auth.verify, auth.verifyAdmin, (req,res) => {
+	userControllers.setAsAdmin(req.params.id).then(result => {
+		if(result) {
+			res.send({result : "OK"})
+		} else {
+			res.status(500).send({result : "ERROR"})
 		}
 	})
 })
