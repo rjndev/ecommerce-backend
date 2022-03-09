@@ -5,7 +5,10 @@ const auth = require('../middlewares/auth')
 
 router.post('/register', (req,res)=> {
 	userControllers.register(req.body).then(result => {
-		if(result) {
+		if(result == "EA") {
+			res.status(400).send("EA")
+		} 
+		else if(result) {
 			res.send("OK")
 		} else {
 			res.status(500).send("ERROR")
@@ -17,7 +20,8 @@ router.post('/register', (req,res)=> {
 
 router.post('/login', (req,res)=> {
 	userControllers.login(req.body).then(result => {
-		if(!result) {
+
+		 if(!result) {
 			res.status(400).send("WC")
 		} else {
 			res.send(result)
