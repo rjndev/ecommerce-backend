@@ -55,6 +55,20 @@ module.exports.verifyAdmin = (req,res,next) => {
 	if(data.isAdmin) {
 		return next()
 	} else {
-		return res.status(400).send("NA")
+		return res.status(400).send({auth : "failed NA"})
+	}
+}
+
+
+module.exports.verifyNotAdmin = (req,res,next) => {
+	let token = req.headers.authorization
+	token = token.slice(7, token.length)
+
+	let data = module.exports.decode(token)
+
+	if(!data.isAdmin) {
+		return next()
+	} else {
+		return res.status(400).send({auth : "failed A"})
 	}
 }

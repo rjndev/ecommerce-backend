@@ -6,7 +6,7 @@ const productControllers = require('../controllers/productControllers')
 
 
 
-//ADMIN Protected Routes
+//*ADMIN Protected Routes
 //Create a new Product Route
 router.post('/create', auth.verify, auth.verifyAdmin, (req,res)=> {
 	productControllers.createProduct(req.body).then(result => {
@@ -55,7 +55,7 @@ router.put('/details/:id/archive', auth.verify, auth.verifyAdmin, (req,res) => {
 
 
 
-//NON PROTECTED
+//*NON PROTECTED
 router.get('/details/:id', (req,res) => {
 	productControllers.getProduct(req.params.id).then(result => {
 		if(!result) {

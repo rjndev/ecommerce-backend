@@ -20,6 +20,10 @@ const userSchema =  mongoose.Schema({
 	isAdmin : {
 		type : Boolean,
 		default : false
+	},
+	currentOrders : {
+		type : Array,
+		default : []
 	}
 })
 

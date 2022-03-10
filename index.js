@@ -5,9 +5,11 @@ const router = express.Router()
 const dotenv = require('dotenv')
 const cors = require('cors')
 
+
 //routes
 const userRoutes = require('./routes/userRoutes')
 const productRoutes = require('./routes/productRoutes')
+const orderRoutes = require('./routes/orderRoutes')
 
 const port = 4001
 
@@ -29,8 +31,7 @@ app.use(cors())
 
 //USE routes
 //all goes through api route
-app.use('/api/users', userRoutes)
+app.use('/api/users', userRoutes, orderRoutes)
 app.use('/api/products', productRoutes)
-
 
 app.listen(process.env.PORT || port, ()=> console.log(`Listening at port ${process.env.PORT || port}`))
