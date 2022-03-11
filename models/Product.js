@@ -28,6 +28,10 @@ const productSchema = mongoose.Schema({
 	categories : {
 		type : Array,
 		default : []
+	},
+	imagePath : {
+		type : String,
+		default : "../img/pizza.png"
 	}
 })
 
