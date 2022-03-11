@@ -1,20 +1,42 @@
 const e = require('express')
 const Product = require('../models/Product')
+const Category = require('../models/Category')
+
+
 
 module.exports.createProduct = async (body) => {
 	
+
 	try {
 		let sameProduct = await Product.findOne({name : body.name})
+		const allCategories = await Category.find()
+
+
 		if(sameProduct == null) {
 			//no same product name
 			let newProduct = new Product({
 				name : body.name,
 				description : body.description,
 				price : body.price,
+				categories  : [...body.categories],
+				rating : body.rating
 			})
 
-			await newProduct.save()
+			let foundCategory
+			//add product to category
+			body.categories.forEach(cat => {
+				foundCategory = allCategories.find(current => current.name == cat.name )
+				foundCategory.products.push({productId : newProduct._id})
+			})
 
+			console.log("FOUND CATEGORY")
+			console.log(foundCategory)
+			console.log(newProduct)
+
+			
+			await newProduct.save()
+			await foundCategory.save()
+			return true
 
 		} else {
 			return false
@@ -71,6 +93,8 @@ module.exports.updateProduct = async (id, body) => {
 			foundProduct.description = body.description
 			foundProduct.price = body.price
 			foundProduct.isActive = body.isActive
+			foundProduct.rating = body.rating,
+			foundProduct.categories = [...body.categories]
  
 			return await foundProduct.save()
 

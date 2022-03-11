@@ -20,6 +20,14 @@ const productSchema = mongoose.Schema({
 	createdOn : {
 		type : Date,
 		default : new Date()
+	},
+	rating : {
+		type : Number,
+		defualt : 0.0
+	},
+	categories : {
+		type : Array,
+		default : []
 	}
 })
 
