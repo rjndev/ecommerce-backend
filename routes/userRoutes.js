@@ -9,9 +9,9 @@ router.post('/register', (req,res)=> {
 			res.status(400).send("EA")
 		} 
 		else if(result) {
-			res.send("OK")
+			res.send({auth : "OK"})
 		} else {
-			res.status(500).send("ERROR")
+			res.status(500).send({result : "ERROR"})
 		}
 	})
 })
@@ -21,9 +21,9 @@ router.post('/login', (req,res)=> {
 	userControllers.login(req.body).then(result => {
 
 		 if(!result) {
-			res.status(400).send("WC")
+			res.send({result : "WC"})
 		} else {
-			res.send(result)
+			res.send({result: result})
 		}
 	})
 })
@@ -34,9 +34,9 @@ router.post('/login', (req,res)=> {
 router.get('/details/all', auth.verify, auth.verifyAdmin, (req,res)=> {
 	userControllers.getAllUsers().then(result => {
 		if(result) {
-			res.send(result)
+			res.send({result : result})
 		} else {
-			res.send("ERROR")
+			res.send({result : "ERROR"})
 		}
 	})
 })

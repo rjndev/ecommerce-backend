@@ -56,6 +56,38 @@ router.put('/details/:id/archive', auth.verify, auth.verifyAdmin, (req,res) => {
 
 
 //*NON PROTECTED
+
+
+router.get('/details/active', (req,res)=> {
+	productControllers.getActiveProducts().then(result => {
+		if(!result) {
+			res.send({result : "failedezzz"})
+		} else {
+			res.send({result : result})
+		}
+	})
+})
+
+router.get('/categories/category', (req,res) => {
+	productControllers.getCategory(req.body).then(result => {
+		if(!result) {
+			res.status(500).send({result : "failed"})
+		} else {
+			res.send({result : result})
+		}
+	})
+})
+
+router.get('/categories/all' , (req,res) => {
+	productControllers.getAllCategories().then(result => {
+		if(!result) {
+			res.status(500).send({result : "failed"})
+		} else {
+			res.send({result : result})
+		}
+	})
+})
+
 router.get('/details/:id', (req,res) => {
 	productControllers.getProduct(req.params.id).then(result => {
 		if(!result) {
@@ -65,16 +97,5 @@ router.get('/details/:id', (req,res) => {
 		}
 	})
 })
-
-router.get('details/active', (req,res)=> {
-	productControllers.getActiveProducts().then(result => {
-		if(!result) {
-			res.status(500).send({result : "failed"})
-		} else {
-			res.send({result : result})
-		}
-	})
-})
-
 
 module.exports = router

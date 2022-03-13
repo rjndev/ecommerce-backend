@@ -19,7 +19,8 @@ module.exports.createProduct = async (body) => {
 				description : body.description,
 				price : body.price,
 				categories  : [...body.categories],
-				rating : body.rating
+				rating : body.rating,
+				imagePath : body.imagePath
 			})
 
 			let foundCategory
@@ -76,6 +77,7 @@ module.exports.getActiveProducts = async () => {
 
 		return activeProducts
 	}catch(err) {
+		console.log("ERROR ACTIVE")
 		console.log(err)
 		return false
 	}
@@ -117,6 +119,30 @@ module.exports.archiveProduct = async (id) => {
 			return await foundProduct.save()
 		}
 	} catch(err) {
+		console.log(err);
+		return false
+	}
+}
+
+module.exports.getCategory = async (body) => {
+	try {
+		const foundCategory = await Category.find({name : body.name})
+
+		return foundCategory
+
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+}
+
+module.exports.getAllCategories = async () => {
+	try {
+		const allCategories = await Category.find()
+
+		return allCategories
+	}catch(err) {
+		console.log(err);
 		return false
 	}
 }
