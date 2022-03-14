@@ -55,6 +55,19 @@ module.exports.getAllUsers = () => {
 	})
 }
 
+module.exports.getUserDetails = async (token) => {
+	const authPayload = auth.decode(token)
+
+	try {
+		const user = await User.findOne({email : authPayload.email})
+
+		return user
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+}
+
 
 module.exports.setAsAdmin = async (id) => {
 

@@ -20,13 +20,13 @@ module.exports.verify = (req, res, next) => {
 
 		return jwt.verify(token, process.env.SECRET, (err, result)=> {
 			if(err) {
-				return res.send(400).send({auth : "failed"})
+				return res.send({auth : "failed"})
 			} else {
 				return next()
 			}
 		})
 	} else {
-		return res.status(400).send({auth : "failed"})
+		return res.send({auth : "failed"})
 	}
 }
 

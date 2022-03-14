@@ -6,12 +6,12 @@ const auth = require('../middlewares/auth')
 router.post('/register', (req,res)=> {
 	userControllers.register(req.body).then(result => {
 		if(result == "EA") {
-			res.status(400).send("EA")
+			res.send({result : "EA"})
 		} 
 		else if(result) {
-			res.send({auth : "OK"})
+			res.send({result : "OK"})
 		} else {
-			res.status(500).send({result : "ERROR"})
+			res.send({result : "ERROR"})
 		}
 	})
 })
@@ -41,6 +41,19 @@ router.get('/details/all', auth.verify, auth.verifyAdmin, (req,res)=> {
 	})
 })
 
+router.get('/details', auth.verify , (req,res) => {
+	let token = req.headers.authorization
+	token = token.slice(7, token.length)
+
+	userControllers.getUserDetails(token).then(result => {
+		if(!result) {
+			res.send({result : "ERROR"})
+		} else {
+			res.send({result: result})
+		}
+	})
+})
+
 router.get('/verifyLoggedIn', auth.verify, (req,res) => {
 	res.send({auth : "VERIFIED"})
 })
@@ -51,7 +64,7 @@ router.put('/:id/setAsAdmin', auth.verify, auth.verifyAdmin, (req,res) => {
 		if(result) {
 			res.send({result : "OK"})
 		} else {
-			res.status(500).send({result : "ERROR"})
+			res.send({result : "ERROR"})
 		}
 	})
 })
