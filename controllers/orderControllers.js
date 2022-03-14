@@ -60,6 +60,10 @@ module.exports.getUserOrders = async (id) => {
 	try {
 		const user = await User.findById(id)
 		const allOrders = await Order.find()
+		const allProducts = await Product.find()
+ 		
+
+		
 		const userOrders = []
 
 
@@ -67,6 +71,22 @@ module.exports.getUserOrders = async (id) => {
 			userOrders.push(allOrders.find(curr => curr._id.toString() == order.orderId))
 		})
 		
+
+		let allOrderTemp = []
+
+
+		//attach the product details on the response so it can be used by the client
+		userOrders.map(order => {
+			order.products.map(product => {
+				let productDetails = allProducts.find(curr => curr._id.toString() == product.productId)
+				product.productDetails  = productDetails
+			})
+		})
+		// let queryFilter = {}
+		console.log("PRODUCTSUSERORDER")
+		console.log(userOrders)
+		
+
 		return userOrders
 	}catch(err) {
 		console.log(err)

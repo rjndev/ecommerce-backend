@@ -41,6 +41,11 @@ router.get('/details/all', auth.verify, auth.verifyAdmin, (req,res)=> {
 	})
 })
 
+router.get('/verifyLoggedIn', auth.verify, (req,res) => {
+	res.send({auth : "VERIFIED"})
+})
+
+
 router.put('/:id/setAsAdmin', auth.verify, auth.verifyAdmin, (req,res) => {
 	userControllers.setAsAdmin(req.params.id).then(result => {
 		if(result) {
