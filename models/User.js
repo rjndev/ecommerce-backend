@@ -22,8 +22,8 @@ const userSchema =  mongoose.Schema({
 		default : false
 	},
 	currentOrders : {
-		type : Array,
-		default : []
+		type : String,
+		default : ""
 	}
 })
 

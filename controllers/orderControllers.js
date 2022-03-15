@@ -29,7 +29,7 @@ module.exports.createOrder = async (userId, data) => {
 		console.log(createdOrder)
 
 		let currentUser = await User.findById(userId)
-		currentUser.currentOrders = [...currentUser.currentOrders ,  {orderId : createdOrder._id}]
+		currentUser.currentOrders = createdOrder._id
 		console.log(currentUser)
 
 		
@@ -62,33 +62,66 @@ module.exports.getUserOrders = async (id) => {
 		const allOrders = await Order.find()
 		const allProducts = await Product.find()
  		
-
+		const userOrder = await Order.findById(user.currentOrders)
 		
-		const userOrders = []
-
-
-		user.currentOrders.forEach(order => {
-			userOrders.push(allOrders.find(curr => curr._id.toString() == order.orderId))
+		userOrder.products.forEach(product => {
+			let productDetails = allProducts.find(curr => curr._id.toString() == product.productId)
+			console.log(productDetails)
+			product.productDetails = productDetails
 		})
+
+		return userOrder
+		// const userOrders = []
+
+
+		// user.currentOrders.forEach(order => {
+		// 	userOrders.push(allOrders.find(curr => curr._id.toString() == order.orderId))
+		// })
 		
 
-		let allOrderTemp = []
-
-
-		//attach the product details on the response so it can be used by the client
-		userOrders.map(order => {
-			order.products.map(product => {
-				let productDetails = allProducts.find(curr => curr._id.toString() == product.productId)
-				product.productDetails  = productDetails
-			})
-		})
-		// let queryFilter = {}
-		console.log("PRODUCTSUSERORDER")
-		console.log(userOrders)
+		
+		// //attach the product details on the response so it can be used by the client
+		// userOrders.map(order => {
+		// 	order.products.map(product => {
+		// 		let productDetails = allProducts.find(curr => curr._id.toString() == product.productId)
+		// 		product.productDetails  = productDetails
+		// 	})
+		// })
+		// // let queryFilter = {}
+		// console.log("PRODUCTSUSERORDER")
+		// console.log(userOrders)
 		
 
-		return userOrders
+		// return userOrders
 	}catch(err) {
+		console.log(err)
+		return false
+	}
+}
+
+module.exports.addToCart = async (id, data) => {
+	try {	
+		const user = await User.findById(id)
+		
+		//Check if there is order
+		if(user.currentOrders !== "") {
+			//if there is order add to that order
+			const order = await Order.findOne({userId : id})
+			console.log(id)
+			console.log(order.products)
+			order.products = [...order.products, data]
+
+			await order.save()
+			return true
+		}else {
+
+			console.log("NO ORDER FOUND CREATING ORDER..")
+			const result =await module.exports.createOrder(id, {products : [data]})
+			if(result) 
+				return true
+			else return false
+		}
+	}catch (err) {
 		console.log(err)
 		return false
 	}
