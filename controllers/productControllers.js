@@ -150,7 +150,7 @@ module.exports.getAllCategories = async () => {
 module.exports.getProductsInCategory = async (body) => {
 	try {
 		const foundCategory = await Category.findOne({name : body.name})
-		const allProducts = await Product.find()
+		const allProducts = await Product.find({isActive : true})
 		console.log("BODY")
 		console.log(body)
 		let products = []
