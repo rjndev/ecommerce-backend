@@ -88,6 +88,16 @@ router.get('/categories/all' , (req,res) => {
 	})
 })
 
+router.get('/categories/contained', (req,res) => {
+	productControllers.getProductsInCategory(req.body).then(result => {
+		if(!result) {
+			res.status(500).send({result : "failed"})
+		} else {
+			res.send({result : result})
+		}
+	})
+})
+
 router.get('/details/:id', (req,res) => {
 	productControllers.getProduct(req.params.id).then(result => {
 		if(!result) {

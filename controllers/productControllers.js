@@ -146,3 +146,23 @@ module.exports.getAllCategories = async () => {
 		return false
 	}
 }
+
+module.exports.getProductsInCategory = async (body) => {
+	try {
+		const foundCategory = await Category.findOne({name : body.name})
+		const allProducts = await Product.find()
+
+		let products = []
+
+		foundCategory.products.forEach(product => {
+			let curProduct = allProducts.find(curr => curr._id.toString() == product.productId)
+			if (curProduct != null)
+				products.push(curProduct)
+		})
+
+		return products
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+}
