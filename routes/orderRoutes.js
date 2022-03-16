@@ -62,6 +62,20 @@ router.get('/myOrders', auth.verify, auth.verifyNotAdmin, (req,res) => {
 	})
 })
 
+router.delete('/myOrders/deleteProduct', auth.verify, (req,res) => {
+	let token = req.headers.authorization
+	token = token.slice(7,token.length)
+	const userId = auth.decode(token).id
+
+	orderControllers.deleteProductFromOrder(userId, req.body.index).then(result => {
+		if(!result) {
+			res.send({result : "ERROR"})
+		} else {
+			res.send({result : "OK"})
+		}
+	})
+})
+
 
 
 module.exports = router

@@ -126,3 +126,26 @@ module.exports.addToCart = async (id, data) => {
 		return false
 	}
 }
+
+module.exports.deleteProductFromOrder = async (id, index) => {
+
+	try {
+		
+		const user = await User.findById(id)
+		const order = await Order.findById(user.currentOrders)
+
+		let newProducts = order.products.filter((prod, i) => {return i != index})
+
+
+		order.products = [...newProducts]
+
+		console.log("DELETING..")
+
+		await order.save()
+		return true
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+
+}
