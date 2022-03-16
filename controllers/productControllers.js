@@ -151,7 +151,8 @@ module.exports.getProductsInCategory = async (body) => {
 	try {
 		const foundCategory = await Category.findOne({name : body.name})
 		const allProducts = await Product.find()
-
+		console.log("BODY")
+		console.log(body)
 		let products = []
 
 		foundCategory.products.forEach(product => {

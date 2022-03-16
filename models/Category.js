@@ -8,6 +8,10 @@ const categorySchema = mongoose.Schema({
 	products : {
 		type : Array,
 		default : []
+	},
+	imagePath : {
+		type : String, 
+		required : [true, "Image path is requried"]
 	}
 })
 
