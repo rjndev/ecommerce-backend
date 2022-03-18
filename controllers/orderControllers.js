@@ -102,6 +102,7 @@ module.exports.getUserOrders = async (id) => {
 module.exports.addToCart = async (id, data) => {
 	try {	
 		const user = await User.findById(id)
+		const allProducts = await Product.find()
 		
 		//Check if there is order
 		if(user.currentOrders !== "") {
@@ -110,6 +111,15 @@ module.exports.addToCart = async (id, data) => {
 			console.log(id)
 			console.log(order.products)
 			order.products = [...order.products, data]
+
+			let totalAmount = 0
+
+			order.products.forEach(prod => {
+				let foundProduct = allProducts.find(curr => curr._id.toString() == prod.productId)
+				totalAmount += prod.amoung * foundProduct.price
+			})
+
+			order.totalAmount = totalAmount
 
 			await order.save()
 			return true
