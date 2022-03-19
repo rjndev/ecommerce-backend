@@ -156,6 +156,13 @@ module.exports.deleteProductFromOrder = async (id, index) => {
 
 		console.log("DELETING..")
 
+		if (order.products.length == 0) {
+			//delete order
+			user.currentOrders = ""
+			await Order.remove({_id : order._id})
+			await user.save()
+			return true
+		}
 
 		let totalAmount = 0
 
