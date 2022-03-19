@@ -115,8 +115,12 @@ module.exports.addToCart = async (id, data) => {
 			let totalAmount = 0
 
 			order.products.forEach(prod => {
+				console.log("FOUND PROD")
+				
 				let foundProduct = allProducts.find(curr => curr._id.toString() == prod.productId)
-				totalAmount += prod.amoung * foundProduct.price
+				console.log(foundProduct)
+				totalAmount += prod.amount * foundProduct.price
+				console.log(totalAmount)
 			})
 
 			order.totalAmount = totalAmount
@@ -150,6 +154,16 @@ module.exports.deleteProductFromOrder = async (id, index) => {
 		order.products = [...newProducts]
 
 		console.log("DELETING..")
+
+
+		let totalAmount = 0
+
+		order.products.forEach(prod => {
+			let foundProduct = allProducts.find(curr => curr._id.toString() == prod.productId)
+			totalAmount += prod.amount * foundProduct.price
+		})
+
+		order.totalAmount = totalAmount
 
 		await order.save()
 		return true
