@@ -147,6 +147,7 @@ module.exports.deleteProductFromOrder = async (id, index) => {
 		
 		const user = await User.findById(id)
 		const order = await Order.findById(user.currentOrders)
+		const allProducts = await Product.find()
 
 		let newProducts = order.products.filter((prod, i) => {return i != index})
 
