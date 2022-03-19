@@ -174,3 +174,25 @@ module.exports.deleteProductFromOrder = async (id, index) => {
 	}
 
 }
+
+module.exports.payOrder = async (id) => {
+	try {
+		const user = await User.findById(id)
+
+
+		if(user.currentOrders != "") {
+			const order = await Order.findById(user.currentOrders) 
+
+			order.deliveryStatus = 1
+
+			await order.save()
+			return true
+		} else {
+			return false
+		}
+		
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+}

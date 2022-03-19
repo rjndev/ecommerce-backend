@@ -76,6 +76,18 @@ router.delete('/myOrders/deleteProduct', auth.verify, (req,res) => {
 	})
 })
 
+router.post('/myOrders/pay', auth.verify, (req,res) => {
+	let token = req.headers.authorization
+	token = token.slice(7,token.length)
+	const userId = auth.decode(token).id
 
+	orderControllers.payOrder(userId).then(result => {
+		if(!result) {
+			res.send({result : "ERROR"})
+		} else {
+			res.send({result : "OK"})
+		}
+	})
+})
 
 module.exports = router
