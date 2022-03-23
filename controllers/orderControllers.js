@@ -13,7 +13,6 @@ module.exports.createOrder = async (userId, data) => {
 
 		let allProducts = await Product.find()
 
-
 		let currentTotal = 0
 		data.products.forEach(product => {
 			let foundProduct = allProducts.find((current) => current._id.toString() == product.productId)
@@ -31,8 +30,6 @@ module.exports.createOrder = async (userId, data) => {
 		let currentUser = await User.findById(userId)
 		currentUser.currentOrders = createdOrder._id
 		console.log(currentUser)
-
-		
 		
 		await createdOrder.save()
 		await currentUser.save()
@@ -71,28 +68,6 @@ module.exports.getUserOrders = async (id) => {
 		})
 
 		return userOrder
-		// const userOrders = []
-
-
-		// user.currentOrders.forEach(order => {
-		// 	userOrders.push(allOrders.find(curr => curr._id.toString() == order.orderId))
-		// })
-		
-
-		
-		// //attach the product details on the response so it can be used by the client
-		// userOrders.map(order => {
-		// 	order.products.map(product => {
-		// 		let productDetails = allProducts.find(curr => curr._id.toString() == product.productId)
-		// 		product.productDetails  = productDetails
-		// 	})
-		// })
-		// // let queryFilter = {}
-		// console.log("PRODUCTSUSERORDER")
-		// console.log(userOrders)
-		
-
-		// return userOrders
 	}catch(err) {
 		console.log(err)
 		return false
@@ -179,7 +154,6 @@ module.exports.deleteProductFromOrder = async (id, index) => {
 		console.log(err)
 		return false
 	}
-
 }
 
 module.exports.payOrder = async (id) => {
