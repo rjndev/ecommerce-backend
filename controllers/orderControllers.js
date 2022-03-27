@@ -15,10 +15,12 @@ module.exports.createOrder = async (userId, data) => {
 
 		let currentTotal = 0
 		data.products.forEach(product => {
+
 			let foundProduct = allProducts.find((current) => current._id.toString() == product.productId)
 			currentTotal += foundProduct.price * product.amount
 		})
 
+		
 		let createdOrder = new Order({
 			totalAmount : currentTotal,
 			userId : userId,
