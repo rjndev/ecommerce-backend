@@ -1,11 +1,12 @@
 const e = require('express')
 const Product = require('../models/Product')
 const Category = require('../models/Category')
+const Seller = require('../models/Seller')
+const mongoose = require('mongoose')
 
 
 
-module.exports.createProduct = async (body) => {
-	
+module.exports.createProduct = async (sellerId, body) => {
 
 	try {
 		let sameProduct = await Product.findOne({name : body.name})
@@ -19,24 +20,30 @@ module.exports.createProduct = async (body) => {
 				description : body.description,
 				price : body.price,
 				categories  : [...body.categories],
-				rating : body.rating,
-				imagePath : body.imagePath
+				rating : 0,
+				imagePath : body.imagePath,
+				seller : mongoose.Types.ObjectId(sellerId)
 			})
 
 			let foundCategory
 			//add product to category
 			body.categories.forEach(cat => {
 				foundCategory = allCategories.find(current => current.name == cat.name )
-				foundCategory.products.push({productId : newProduct._id})
+				foundCategory.products.push(newProduct._id)
 			})
 
 			console.log("FOUND CATEGORY")
 			console.log(foundCategory)
 			console.log(newProduct)
 
+			//add product to Seller
+			let foundSeller = await Seller.findById(sellerId)
+			foundSeller.products.push(newProduct._id)
+
 			
 			await newProduct.save()
 			await foundCategory.save()
+			await foundSeller.save()
 			return true
 
 		} else {
@@ -53,7 +60,7 @@ module.exports.createProduct = async (body) => {
 
 module.exports.getProduct = async (id) => {
 	try {
-		let foundProduct = await Product.findById(id)
+		let foundProduct = await Product.findById(id).populate('seller').exec()
 
 		return foundProduct
 	}catch(err) {
@@ -63,7 +70,7 @@ module.exports.getProduct = async (id) => {
 
 module.exports.getAllProducts = async ()=> {
 	try {
-		let products = await Product.find()
+		let products =  await Product.find().populate('seller').exec()
 		return products
 	}catch(err) {
 		console.log(err)
@@ -73,7 +80,7 @@ module.exports.getAllProducts = async ()=> {
 
 module.exports.getActiveProducts = async () => {
 	try {
-		let activeProducts = await Product.find({isActive : true})
+		let activeProducts = await Product.find({isActive : true}).populate('seller').exec()
 
 		return activeProducts
 	}catch(err) {
@@ -97,9 +104,8 @@ module.exports.updateProduct = async (id, body) => {
 			foundProduct.isActive = body.isActive
 			foundProduct.rating = body.rating,
 			foundProduct.categories = [...body.categories]
- 
+			foundProduct.seller = mongoose.Types.ObjectId(body.sellerId)
 			return await foundProduct.save()
-
 		}
 	}catch(err) {
 		return false
@@ -149,17 +155,12 @@ module.exports.getAllCategories = async () => {
 
 module.exports.getProductsInCategory = async (body) => {
 	try {
-		const foundCategory = await Category.findOne({name : body.name})
-		const allProducts = await Product.find({isActive : true})
-		console.log("BODY")
-		console.log(body)
-		let products = []
+		let products =[]
 
-		foundCategory.products.forEach(product => {
-			let curProduct = allProducts.find(curr => curr._id.toString() == product.productId)
-			if (curProduct != null)
-				products.push(curProduct)
-		})
+		const foundCategory = await Category.findOne({name : body.name}).populate('products').exec()
+		console.log("FOUND CATEGORYYYYYY")
+		console.log(foundCategory)
+		products = [...foundCategory.products]
 
 		return products
 	}catch(err) {

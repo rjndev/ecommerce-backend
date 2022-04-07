@@ -1,9 +1,9 @@
 const Order = require('../models/Order')
 const User = require('../models/User')
+const Seller = require('../models/Seller')
 const Product = require('../models/Product')
 const mongoose = require('mongoose')
 const { findById } = require('../models/Product')
-
 
 //User checkout
 module.exports.createOrder = async (userId, data) => {
@@ -11,33 +11,46 @@ module.exports.createOrder = async (userId, data) => {
 	//Then save Order model to database and update User's current order with it's ID
 	try {
 
-		let allProducts = await Product.find()
-
+		let queryFields = []
 		let currentTotal = 0
-		data.products.forEach(product => {
-
-			let foundProduct = allProducts.find((current) => current._id.toString() == product.productId)
-			currentTotal += foundProduct.price * product.amount
+		
+		//push Product Ids to queryField to use for $or aggregate in find
+		data.products.forEach(prod => {
+			queryFields.push({'_id' : mongoose.Types.ObjectId(prod.productId)})
 		})
 
-		
+		//find the Products involved in the order
+		let foundProducts = await Product.find({
+			"$or" : queryFields
+		})
+
+		//calculate the amount using the products
+		data.products.forEach(prod => {
+			let foundProd = foundProducts.find(current => current._id.toString() == prod.productId)
+			currentTotal += foundProd.price * prod.amount
+		})
+
 		let createdOrder = new Order({
 			totalAmount : currentTotal,
 			userId : userId,
 			products : data.products
 		})
 
+		//push Ids into the details for populate() later on when needed
+		data.products.forEach(prod => {
+			createdOrder.productDetails.push(mongoose.Types.ObjectId(prod.productId))
+		})
+
+		console.log("CREATED ORDER")
 		console.log(createdOrder)
 
 		let currentUser = await User.findById(userId)
 		currentUser.currentOrders = createdOrder._id
-		console.log(currentUser)
 		
 		await createdOrder.save()
 		await currentUser.save()
 
 		return true
-
 	}catch(err) {
 		console.log(err)
 		return false

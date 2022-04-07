@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken')
+const Seller = require('../models/Seller')
+
 
 
 module.exports.createAccessToken = (user) => {
@@ -9,6 +11,23 @@ module.exports.createAccessToken = (user) => {
 	}
 
 	return jwt.sign(data, process.env.SECRET, {})
+}
+
+
+
+module.exports.verifySeller = async (req, res, next) => {
+	let token = req.headers.authorization
+	
+	token = token.slice(7,token.length)
+	let id = this.decode(token).id
+
+	let foundSeller = await Seller.findById(id)
+
+	if(foundSeller) {
+		next()
+	} else {
+		return res.send({auth : "failed"})
+	}
 }
 
 module.exports.verify = (req, res, next) => {

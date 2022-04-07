@@ -10,6 +10,7 @@ const cors = require('cors')
 const userRoutes = require('./routes/userRoutes')
 const productRoutes = require('./routes/productRoutes')
 const orderRoutes = require('./routes/orderRoutes')
+const sellerRoutes  = require('./routes/sellerRoutes')
 
 const port = 4001
 
@@ -33,5 +34,6 @@ app.use(cors())
 //all goes through api route
 app.use('/api/users', userRoutes, orderRoutes)
 app.use('/api/products', productRoutes)
+app.use('/api/seller', sellerRoutes)
 
 app.listen(process.env.PORT || port, ()=> console.log(`Listening at port ${process.env.PORT || port}`))

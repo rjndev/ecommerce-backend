@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const {Schema} = mongoose
 const orderSchema = mongoose.Schema({
 	totalAmount : {
 		type : Number,
@@ -20,7 +20,8 @@ const orderSchema = mongoose.Schema({
 	deliveryStatus : {
 		type : Number,
 		default: 0
-	}
+	},
+	productDetails : [{type : Schema.Types.ObjectId, ref : 'Products'}]
 })
 
 module.exports = mongoose.model('Order', orderSchema)

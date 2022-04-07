@@ -8,8 +8,13 @@ const productControllers = require('../controllers/productControllers')
 
 //*ADMIN Protected Routes
 //Create a new Product Route
-router.post('/create', auth.verify, auth.verifyAdmin, (req,res)=> {
-	productControllers.createProduct(req.body).then(result => {
+router.post('/create', auth.verify, auth.verifySeller, (req,res)=> {
+	
+	let token = req.headers.authorization
+	token = token.slice(7,token.length)
+
+	let sellerId = auth.decode(token).id
+	productControllers.createProduct(sellerId, req.body).then(result => {
 		if(result?.error) {
 			res.status(400).send("ERROR")
 		} else if(result == false){
@@ -24,7 +29,7 @@ router.post('/create', auth.verify, auth.verifyAdmin, (req,res)=> {
 router.get('/details/all', auth.verify, auth.verifyAdmin, (req,res)=> {
 	productControllers.getAllProducts().then(result => {
 		if(!result) {
-			res.status(500).send({result : "failed"})
+			res.send({result : "failed"})
 		} else {
 			res.send({result : result})
 		}

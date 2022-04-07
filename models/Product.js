@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const {Schema} = mongoose
 
 const productSchema = mongoose.Schema({
 	name : {
@@ -25,14 +26,17 @@ const productSchema = mongoose.Schema({
 		type : Number,
 		defualt : 0.0
 	},
-	categories : {
-		type : Array,
-		required : [true, "Categories is required at least one"]
-	},
+	categories : [],
+
 	imagePath : {
 		type : String,
 		default : "/images/pizza.png"
-	}	
+	},
+	allUserRatings : {
+		type : Array,
+		default : []
+	},
+	seller : {type : Schema.Types.ObjectId, ref : 'Seller'}
 })
 
 
