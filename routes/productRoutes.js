@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const auth = require('../middlewares/auth')
 const productControllers = require('../controllers/productControllers')
-
+const sellerController = require('../controllers/sellerControllers')
 
 
 
@@ -16,9 +16,9 @@ router.post('/create', auth.verify, auth.verifySeller, (req,res)=> {
 	let sellerId = auth.decode(token).id
 	productControllers.createProduct(sellerId, req.body).then(result => {
 		if(result?.error) {
-			res.status(400).send("ERROR")
+			res.send({result : "ERROR"})
 		} else if(result == false){
-			res.status(400).send({result : "EP"})
+			res.send({result : "EP"})
 		} else {
 			res.send({result : "OK"})
 		}
@@ -36,16 +36,39 @@ router.get('/details/all', auth.verify, auth.verifyAdmin, (req,res)=> {
 	})
 })
 
-//UPDATE product information
-router.put('/details/:id/update', auth.verify, auth.verifyAdmin, (req,res)=>{ 
-	productControllers.updateProduct(req.params.id, req.body).then(result=> {
-
+router.post('/details/random', (req, res) => {
+	productControllers.getRandomProducts(req.body.size).then(result => {
 		if(!result) {
-			res.status(500).send({result : "failed"})
+			res.send({result : "failed"})
 		} else {
-			res.send({result : "OK"})
+			res.send({result : result})
 		}
 	})
+	
+})
+
+//UPDATE product information
+router.put('/details/:id/update', auth.verify, auth.verifySeller, (req,res)=>{ 
+	let token = req.headers.authorization
+	token = token.slice(7,token.length)
+	sellerId = auth.decode(token).id
+
+	sellerController.authOwnership(sellerId, req.params.id).then(result => {
+		if(!result) {
+			res.send({result : "failed auth"})
+		} else {
+			productControllers.updateProduct(req.params.id, req.body, sellerId).then(result2=> {
+
+				if(!result2) {
+					res.status(500).send({result : "failed"})
+				} else {
+					res.send({result : "OK"})
+				}
+			})
+		}
+	})
+	
+	
 })
 
 router.put('/details/:id/archive', auth.verify, auth.verifyAdmin, (req,res) => {

@@ -2,6 +2,72 @@ const Seller = require('../models/Seller')
 const Product = require('../models/Product')
 const bcrypt = require('bcrypt')
 const auth = require('../middlewares/auth')
+const Order = require('../models/Order')
+
+
+const hasDuplicate = (id, orders) => {
+
+	for(let i = 0; i < orders.length; i++) {
+		if(id == orders[i]._id.toString()) {
+			return true
+		}
+	}
+
+	return false
+}
+
+module.exports.getProductsFromOrder = async(sellerId) => {
+	try { 
+
+		const seller = await Seller.findById(sellerId).populate('products').exec()
+		
+		const ordersInvolved = []
+		const allOrdersWithDetails = []
+
+
+		for(let i = 0; i < seller.products.length; i++) {
+			console.log("FINDING ORDER...")
+			let orderFound = await Order.findOne({productDetails : seller.products[i]})
+			
+		
+			if(orderFound != null && !hasDuplicate(orderFound._id.toString(), ordersInvolved)) {
+				
+				console.log("ORDER FOUND")
+				console.log(orderFound)
+				ordersInvolved.push(orderFound)
+			}
+			
+		}
+
+		console.log("ORDERS INVOLVED")
+		console.log(ordersInvolved)
+
+		ordersInvolved.forEach(order => {
+			let productsInvolved = []
+			order.products.forEach(product => {
+				let checkOwnProduct = seller.products.find(curr => curr._id.toString() == product.productId)
+				
+				if(checkOwnProduct != undefined) {
+					productsInvolved.push({product : checkOwnProduct, amount : product.amount})
+				}
+			})
+
+			allOrdersWithDetails.push({
+				order : order,
+				productsInvolved : productsInvolved
+			})
+		})
+		
+
+		console.log("ALLORDERS WITH DETAILS")
+		console.log(allOrdersWithDetails)
+		return allOrdersWithDetails
+
+	} catch(err) {
+		console.log(err)
+		return false
+	}
+}
 
 
 module.exports.getProducts = async (sellerId) => {
@@ -23,7 +89,7 @@ module.exports.authOwnership = async (sellerId, productId) => {
 		const foundProduct = await Product.findById(productId)
 
 		if(foundProduct) {
-			if (foundProduct.sellerId == sellerId) {
+			if (foundProduct.seller.toString() == sellerId) {
 				return true
 			} else {
 				return false
@@ -41,7 +107,8 @@ module.exports.getDetails = async (token) => {
 	try { 
 		const authPayload = auth.decode(token)
 
-		const seller = await Seller.findById(authPayload.id)
+		const seller = await Seller.findById(authPayload.id).populate('products').exec()
+
 
 		return seller
 	}catch(err) {

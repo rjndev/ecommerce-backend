@@ -2,6 +2,7 @@ const e = require('express')
 const Product = require('../models/Product')
 const Category = require('../models/Category')
 const Seller = require('../models/Seller')
+const Order = require('../models/Order')
 const mongoose = require('mongoose')
 
 
@@ -11,7 +12,7 @@ module.exports.createProduct = async (sellerId, body) => {
 	try {
 		let sameProduct = await Product.findOne({name : body.name})
 		const allCategories = await Category.find()
-
+		
 
 		if(sameProduct == null) {
 			//no same product name
@@ -57,6 +58,18 @@ module.exports.createProduct = async (sellerId, body) => {
 	}
 }
 
+module.exports.getRandomProducts = async (size) => {
+	try {
+		const res = await Product.aggregate().sample(size)
+
+		console.log(res)
+		return res
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+}
+
 
 module.exports.getProduct = async (id) => {
 	try {
@@ -90,8 +103,41 @@ module.exports.getActiveProducts = async () => {
 	}
 }
 
+const updateAllOrderAmounts = async (productId) => {
+	try {
+		const ordersInvolved = await Order.find({productDetails : mongoose.Types.ObjectId(productId)}).populate('productDetails').exec()
 
-module.exports.updateProduct = async (id, body) => {
+		console.log("ORDERS INVOLVEDZZZ")
+		console.log(ordersInvolved)
+
+		ordersInvolved.forEach((order) => {
+			let total = 0
+			order.products.map((product, i) => {
+				total += product.amount * order.productDetails[i].price
+			})
+			order.totalAmount = total
+			console.log("TOTAL AMOUNT")
+			console.log(total)
+		})
+
+		for(let i = 0; i < ordersInvolved.length; i++) {
+			await ordersInvolved[i].save()
+		}
+
+		console.log("NEW ORDERS INVOLVEDZZZ")
+		console.log(ordersInvolved)
+
+		return true
+
+
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+
+}
+
+module.exports.updateProduct = async (id, body, sellerId) => {
 	try {
 		let foundProduct = await Product.findById(id)
 		if(foundProduct == null) {
@@ -101,11 +147,16 @@ module.exports.updateProduct = async (id, body) => {
 			foundProduct.name = body.name
 			foundProduct.description = body.description
 			foundProduct.price = body.price
-			foundProduct.isActive = body.isActive
-			foundProduct.rating = body.rating,
+			foundProduct.isActive =true 
+			foundProduct.rating = 0,
 			foundProduct.categories = [...body.categories]
-			foundProduct.seller = mongoose.Types.ObjectId(body.sellerId)
-			return await foundProduct.save()
+			foundProduct.seller = mongoose.Types.ObjectId(sellerId)
+
+			await foundProduct.save()
+
+			const ordersInvolved = await updateAllOrderAmounts(foundProduct._id.toString())
+			return ordersInvolved
+			// return await foundProduct.save()
 		}
 	}catch(err) {
 		return false

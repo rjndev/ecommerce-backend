@@ -21,11 +21,26 @@ router.get('/authOwnership/:id' , (req,res) => {
 	})
 })
 
+router.get('/productsFromOrder', auth.verifySeller, (req,res) => {
+	let token = req.headers.authorization
+	token = token.slice(7, token.length)
+	sellerId = auth.decode(token).id
+	sellerController.getProductsFromOrder(sellerId).then(result => {
+		if(!result) {
+			res.send({result : "ERR"})
+		} else {
+			res.send({result : result})
+		}
+	})
+})
+
 
 router.post('/create', (req,res) => {
 	sellerController.createSeller(req.body).then(result => {
 		if(!result) {
 			res.send({result : "Failed"})
+		} else if(result === "AE"){
+			res.send({result : "EA"})
 		} else {
 			res.send({result : "OK"})
 		}

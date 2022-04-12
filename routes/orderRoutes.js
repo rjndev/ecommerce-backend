@@ -33,6 +33,10 @@ router.post('/checkout', auth.verify, auth.verifyNotAdmin, (req,res)=> {
 	})
 })
 
+router.post('/payCart', auth.verify, auth.verifyNotAdmin, (req,res )=> {
+	
+})
+
 router.post('/addToCart', auth.verify, auth.verifyNotAdmin, (req,res)=> {
 	let token = req.headers.authorization
 	token = token.slice(7,token.length)
@@ -53,11 +57,27 @@ router.get('/myOrders', auth.verify, auth.verifyNotAdmin, (req,res) => {
 	token = token.slice(7,token.length)
 	const userId = auth.decode(token).id
 
+	console.log('sending orders!')
 	orderControllers.getUserOrders(userId).then(result => {
 		if(!result) {
 			res.send({result : "ERROR"})
 		} else {
 			res.send({result : result})
+		}
+	})
+})
+
+router.put('/myOrders/editProductQuantity', auth.verify, (req,res) => {
+	let token = req.headers.authorization
+	token = token.slice(7, token.length)
+
+	const userId = auth.decode(token).id
+
+	orderControllers.editProductQuantity(userId, req.body.index, req.body.quantity).then(result => {
+		if(!result) {
+			res.send({result : "ERROR"})
+		} else {
+			res.send({result : "OK"})
 		}
 	})
 })

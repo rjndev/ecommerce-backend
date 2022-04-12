@@ -3,7 +3,6 @@ const User = require('../models/User')
 const Seller = require('../models/Seller')
 const Product = require('../models/Product')
 const mongoose = require('mongoose')
-const { findById } = require('../models/Product')
 
 //User checkout
 module.exports.createOrder = async (userId, data) => {
@@ -68,19 +67,21 @@ module.exports.getAllOrders = async () => {
 	}
 }
 
+
+
 module.exports.getUserOrders = async (id) => {
 	try {
 		const user = await User.findById(id)
 		const allOrders = await Order.find()
 		const allProducts = await Product.find()
  		
-		const userOrder = await Order.findById(user.currentOrders)
+		const userOrder = await Order.findById(user.currentOrders).populate('productDetails').exec()
 		
-		userOrder.products.forEach(product => {
-			let productDetails = allProducts.find(curr => curr._id.toString() == product.productId)
-			console.log(productDetails)
-			product.productDetails = productDetails
-		})
+		// userOrder.products.forEach(product => {
+		// 	let productDetails = allProducts.find(curr => curr._id.toString() == product.productId)
+		// 	console.log(productDetails)
+		// 	product.productDetails = productDetails
+		// })
 
 		return userOrder
 	}catch(err) {
@@ -101,21 +102,28 @@ module.exports.addToCart = async (id, data) => {
 			console.log(id)
 			console.log(order.products)
 			order.products = [...order.products, data]
+			order.productDetails = [...order.productDetails, mongoose.Types.ObjectId(data.productId)]
+
+			await order.save()
+
+			const newOrder = await Order.findOne({userId : id}).populate('productDetails').exec()
+
+
 
 			let totalAmount = 0
 
-			order.products.forEach(prod => {
+			newOrder.products.forEach(prod => {
 				console.log("FOUND PROD")
 				
-				let foundProduct = allProducts.find(curr => curr._id.toString() == prod.productId)
+				let foundProduct = newOrder.productDetails.find(curr => curr._id.toString() == prod.productId)
 				console.log(foundProduct)
 				totalAmount += prod.amount * foundProduct.price
 				console.log(totalAmount)
 			})
 
-			order.totalAmount = totalAmount
+			newOrder.totalAmount = totalAmount
 
-			await order.save()
+			await newOrder.save()
 			return true
 		}else {
 
@@ -131,6 +139,43 @@ module.exports.addToCart = async (id, data) => {
 	}
 }
 
+module.exports.editProductQuantity = async (userId, index, quantity) => {
+	try {
+		const user = await User.findById(userId)
+		let orderId = user.currentOrders
+		const order = await Order.findById(orderId).populate('productDetails').exec()
+		
+
+
+		order.products[index].amount = quantity
+		console.log("PRODUCT QUANTITY")
+		console.log(order.products[index].amount)
+		console.log(order.products)
+		
+		
+		let totalAmount = 0
+		order.products.forEach(prod => {
+			let foundProduct = order.productDetails.find(curr => curr._id.toString() == prod.productId)
+			totalAmount += prod.amount * foundProduct.price
+		})
+
+		order.totalAmount = totalAmount
+
+		console.log('EDIT ORDER QUANTITY')
+		console.log(order)
+
+		await Order.findByIdAndUpdate(orderId, {products : order.products, totalAmount: totalAmount})
+		// await order.save()
+
+
+		return true
+	}catch(err) {
+		console.log(err)
+		return false
+	}
+}
+
+
 module.exports.deleteProductFromOrder = async (id, index) => {
 
 	try {
@@ -143,6 +188,9 @@ module.exports.deleteProductFromOrder = async (id, index) => {
 
 
 		order.products = [...newProducts]
+
+		let newProductDetails = order.productDetails.filter((prod,i) => {return i !== index})
+		order.productDetails = [...newProductDetails]
 
 		console.log("DELETING..")
 
