@@ -63,7 +63,32 @@ module.exports.getAllOrders = async () => {
 		return allOrders
 	}catch(err) {
 		console.log(err)
-		return false1
+		return false
+	}
+}
+
+module.exports.payOrder2 = async (userId, orderId) => {
+
+	console.log("ZZZ")
+	try {
+		console.log("FINDING")
+		const user = await User.findById(userId)
+		user.currentOrders = ""
+
+		console.log("FOUND USER")
+		console.log(user)
+
+		const order = await Order.findByIdAndDelete(orderId)
+		
+
+		console.log("FOUND ORDER")
+		console.log(order)
+
+		await user.save()
+		return true
+	}catch(err) {
+		console.log(err)
+		return false
 	}
 }
 

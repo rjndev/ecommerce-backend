@@ -34,7 +34,18 @@ router.post('/checkout', auth.verify, auth.verifyNotAdmin, (req,res)=> {
 })
 
 router.post('/payCart', auth.verify, auth.verifyNotAdmin, (req,res )=> {
-	
+	let token = req.headers.authorization
+	token = token.slice(7,token.length)
+	const userId = auth.decode(token).id
+	orderControllers.payOrder2(userId, req.body.orderId).then(result => {
+		console.log("RESULT IS")
+		console.log(result)
+		if(!result) {
+			res.send({result : "ERROR"})
+		} else {
+			res.send({result : "OK"})
+		}
+	})
 })
 
 router.post('/addToCart', auth.verify, auth.verifyNotAdmin, (req,res)=> {
