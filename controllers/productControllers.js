@@ -70,6 +70,19 @@ module.exports.getRandomProducts = async (size) => {
 	}
 }
 
+module.exports.searchProduct = async (searchText) => {
+	try {
+		let foundProducts = await Product.find({"name" : {"$regex" : searchText , "$options" : "i"}})
+
+		return foundProducts
+
+	} catch(err) {
+		return false
+	}
+
+
+}
+
 
 module.exports.getProduct = async (id) => {
 	try {

@@ -47,6 +47,20 @@ router.post('/details/random', (req, res) => {
 	
 })
 
+router.get('/search/:searchText', (req, res) => {
+	productControllers.searchProduct(req.params.searchText).then(result => {
+		if(!result) {
+			res.send({result : "failed"})
+		} else {
+			res.send({result : result})
+		}
+
+
+	})
+
+
+}) 
+
 //UPDATE product information
 router.put('/details/:id/update', auth.verify, auth.verifySeller, (req,res)=>{ 
 	let token = req.headers.authorization
