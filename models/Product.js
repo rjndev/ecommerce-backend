@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import dbConstants from '../dbConstants.js'
 const {Schema} = mongoose
 
 const productSchema = mongoose.Schema({
@@ -40,4 +41,4 @@ const productSchema = mongoose.Schema({
 })
 
 
-module.exports = mongoose.model('Products', productSchema)
+export default mongoose.model(dbConstants.productsString, productSchema)

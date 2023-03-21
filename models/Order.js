@@ -1,5 +1,8 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import dbConstants from '../dbConstants.js'
 const {Schema} = mongoose
+
+
 const orderSchema = mongoose.Schema({
 	totalAmount : {
 		type : Number,
@@ -24,4 +27,5 @@ const orderSchema = mongoose.Schema({
 	productDetails : [{type : Schema.Types.ObjectId, ref : 'Products'}]
 })
 
-module.exports = mongoose.model('Order', orderSchema)
+// module.exports = mongoose.model('Order', orderSchema)
+export default mongoose.model(dbConstants.orderString, orderSchema)

@@ -1,11 +1,11 @@
-const Order = require('../models/Order')
-const User = require('../models/User')
-const Seller = require('../models/Seller')
-const Product = require('../models/Product')
-const mongoose = require('mongoose')
+import Order from '../models/Order.js'
+import User from '../models/User.js'
+import Seller from '../models/Product.js'
+import mongoose from 'mongoose'
+import Product from '../models/Product.js'
 
 //User checkout
-module.exports.createOrder = async (userId, data) => {
+const createOrder = async (userId, data) => {
 	//This controller function gets all necessary product prices and adds them all up to be stored on Order's totalAmount price
 	//Then save Order model to database and update User's current order with it's ID
 	try {
@@ -56,7 +56,7 @@ module.exports.createOrder = async (userId, data) => {
 	}
 }
 
-module.exports.getAllOrders = async () => {
+const getAllOrders = async () => {
 	try {
 		const allOrders = await Order.find()
 
@@ -67,7 +67,7 @@ module.exports.getAllOrders = async () => {
 	}
 }
 
-module.exports.payOrder2 = async (userId, orderId) => {
+const payOrder2 = async (userId, orderId) => {
 
 	console.log("ZZZ")
 	try {
@@ -94,7 +94,7 @@ module.exports.payOrder2 = async (userId, orderId) => {
 
 
 
-module.exports.getUserOrders = async (id) => {
+const getUserOrders = async (id) => {
 	try {
 		const user = await User.findById(id)
 		const allOrders = await Order.find()
@@ -115,7 +115,7 @@ module.exports.getUserOrders = async (id) => {
 	}
 }
 
-module.exports.addToCart = async (id, data) => {
+const addToCart = async (id, data) => {
 	try {	
 		const user = await User.findById(id)
 		const allProducts = await Product.find()
@@ -164,7 +164,7 @@ module.exports.addToCart = async (id, data) => {
 	}
 }
 
-module.exports.editProductQuantity = async (userId, index, quantity) => {
+const editProductQuantity = async (userId, index, quantity) => {
 	try {
 		const user = await User.findById(userId)
 		let orderId = user.currentOrders
@@ -201,7 +201,7 @@ module.exports.editProductQuantity = async (userId, index, quantity) => {
 }
 
 
-module.exports.deleteProductFromOrder = async (id, index) => {
+const deleteProductFromOrder = async (id, index) => {
 
 	try {
 		
@@ -244,7 +244,7 @@ module.exports.deleteProductFromOrder = async (id, index) => {
 	}
 }
 
-module.exports.payOrder = async (id) => {
+const payOrder = async (id) => {
 	try {
 		const user = await User.findById(id)
 
@@ -264,4 +264,15 @@ module.exports.payOrder = async (id) => {
 		console.log(err)
 		return false
 	}
+}
+
+export default { 
+	payOrder,
+	deleteProductFromOrder,
+	editProductQuantity,
+	addToCart,
+	getUserOrders,
+	payOrder2,
+	getAllOrders,
+	createOrder
 }

@@ -1,9 +1,7 @@
-const jwt = require('jsonwebtoken')
-const Seller = require('../models/Seller')
+import jwt from 'jsonwebtoken'
+import Seller from '../models/Seller.js'
 
-
-
-module.exports.createAccessToken = (user) => {
+const createAccessToken = (user) => {
 	const data = {
 		id : user.id,
 		email : user.email,
@@ -15,11 +13,11 @@ module.exports.createAccessToken = (user) => {
 
 
 
-module.exports.verifySeller = async (req, res, next) => {
+const verifySeller = async (req, res, next) => {
 	let token = req.headers.authorization
 	
 	token = token.slice(7,token.length)
-	let id = this.decode(token).id
+	let id = decode(token).id
 
 	let foundSeller = await Seller.findById(id)
 
@@ -30,7 +28,7 @@ module.exports.verifySeller = async (req, res, next) => {
 	}
 }
 
-module.exports.verify = (req, res, next) => {
+const verify = (req, res, next) => {
 	let token = req.headers.authorization
 
 	if(typeof token !== "undefined") {
@@ -49,7 +47,7 @@ module.exports.verify = (req, res, next) => {
 	}
 }
 
-module.exports.decode = (token) => {
+const decode = (token) => {
 
 	if(typeof token !== "undefined") {
 
@@ -65,7 +63,7 @@ module.exports.decode = (token) => {
 	}
 }
 
-module.exports.verifyAdmin = (req,res,next) => {
+const verifyAdmin = (req,res,next) => {
 	let token = req.headers.authorization
 	token = token.slice(7, token.length)
 
@@ -79,7 +77,7 @@ module.exports.verifyAdmin = (req,res,next) => {
 }
 
 
-module.exports.verifyNotAdmin = (req,res,next) => {
+const verifyNotAdmin = (req,res,next) => {
 	let token = req.headers.authorization
 	token = token.slice(7, token.length)
 
@@ -90,4 +88,14 @@ module.exports.verifyNotAdmin = (req,res,next) => {
 	} else {
 		return res.status(400).send({auth : "failed A"})
 	}
+}
+
+export default {
+	createAccessToken,
+	verifySeller,
+	verifyAdmin,
+	verifyNotAdmin,
+	decode,
+	createAccessToken,
+	verify
 }

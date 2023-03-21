@@ -1,5 +1,7 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import dbConstants from '../dbConstants.js'
 const {Schema} = mongoose
+
 
 const categorySchema = mongoose.Schema({
 	name : {
@@ -13,4 +15,5 @@ const categorySchema = mongoose.Schema({
 	}
 })
 
-module.exports = mongoose.model('categories', categorySchema)
+
+export default mongoose.model(dbConstants.categoriesString, categorySchema)

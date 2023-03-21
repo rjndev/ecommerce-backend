@@ -1,13 +1,11 @@
-const e = require('express')
-const Product = require('../models/Product')
-const Category = require('../models/Category')
-const Seller = require('../models/Seller')
-const Order = require('../models/Order')
-const mongoose = require('mongoose')
+import Product from '../models/Product.js'
+import Category from '../models/Category.js'
+import Seller from '../models/Seller.js'
+import e from 'express'
+import Order from '../models/Order.js'
+import mongoose from 'mongoose'
 
-
-
-module.exports.createProduct = async (sellerId, body) => {
+const createProduct = async (sellerId, body) => {
 
 	try {
 		let sameProduct = await Product.findOne({name : body.name})
@@ -58,7 +56,7 @@ module.exports.createProduct = async (sellerId, body) => {
 	}
 }
 
-module.exports.getRandomProducts = async (size) => {
+const getRandomProducts = async (size) => {
 	try {
 		const res = await Product.aggregate().sample(size)
 
@@ -70,7 +68,7 @@ module.exports.getRandomProducts = async (size) => {
 	}
 }
 
-module.exports.searchProduct = async (searchText) => {
+const searchProduct = async (searchText) => {
 	try {
 		let foundProducts = await Product.find({"name" : {"$regex" : searchText , "$options" : "i"}})
 
@@ -84,7 +82,7 @@ module.exports.searchProduct = async (searchText) => {
 }
 
 
-module.exports.getProduct = async (id) => {
+const getProduct = async (id) => {
 	try {
 		let foundProduct = await Product.findById(id).populate('seller').exec()
 
@@ -94,7 +92,7 @@ module.exports.getProduct = async (id) => {
 	}
 }
 
-module.exports.getAllProducts = async ()=> {
+const getAllProducts = async ()=> {
 	try {
 		let products =  await Product.find().populate('seller').exec()
 		return products
@@ -104,7 +102,7 @@ module.exports.getAllProducts = async ()=> {
 	}
 }
 
-module.exports.getActiveProducts = async () => {
+const getActiveProducts = async () => {
 	try {
 		let activeProducts = await Product.find({isActive : true}).populate('seller').exec()
 
@@ -150,7 +148,7 @@ const updateAllOrderAmounts = async (productId) => {
 
 }
 
-module.exports.updateProduct = async (id, body, sellerId) => {
+const updateProduct = async (id, body, sellerId) => {
 	try {
 		let foundProduct = await Product.findById(id)
 		if(foundProduct == null) {
@@ -177,7 +175,7 @@ module.exports.updateProduct = async (id, body, sellerId) => {
 } 
 
 
-module.exports.archiveProduct = async (id) => {
+const archiveProduct = async (id) => {
 	try {
 		let foundProduct = await Product.findById(id)
 
@@ -194,7 +192,7 @@ module.exports.archiveProduct = async (id) => {
 	}
 }
 
-module.exports.getCategory = async (body) => {
+const getCategory = async (body) => {
 	try {
 		const foundCategory = await Category.find({name : body.name})
 
@@ -206,7 +204,7 @@ module.exports.getCategory = async (body) => {
 	}
 }
 
-module.exports.getAllCategories = async () => {
+const getAllCategories = async () => {
 	try {
 		const allCategories = await Category.find()
 
@@ -217,7 +215,7 @@ module.exports.getAllCategories = async () => {
 	}
 }
 
-module.exports.getProductsInCategory = async (body) => {
+const getProductsInCategory = async (body) => {
 	try {
 		let products =[]
 
@@ -231,4 +229,19 @@ module.exports.getProductsInCategory = async (body) => {
 		console.log(err)
 		return false
 	}
+}
+
+export default {
+	getProductsInCategory,
+	getAllCategories,
+	getCategory,
+	archiveProduct,
+	updateProduct,
+	updateAllOrderAmounts,
+	getActiveProducts,
+	getAllProducts,
+	getProduct,
+	searchProduct,
+	getRandomProducts,
+	createProduct,
 }

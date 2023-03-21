@@ -1,75 +1,106 @@
-const express = require('express')
-const router = express.Router()
-const auth = require('../middlewares/auth')
+import express from 'express'
+import auth from '../middlewares/auth.js'
+import sellerController from '../controllers/sellerControllers.js'
+import routeConstants from '../routeConstants.js'
 
-const sellerController = require('../controllers/sellerControllers')
+
+const router = express.Router()
 
 
 //route for checking if current seller has ownership of product
-router.get('/authOwnership/:id' , (req,res) => {
-	const productId = req.params.id
+router.get('/authOwnership/:id' , async (req,res) => {
 
-	let token = req.headers.authorization
-	token = token.slice(7, token.length)
-	sellerId = auth.decode(token).id
-	sellerController.authOwnership(sellerId, productId).then(result => {
+	try {
+		const productId = req.params.id
+
+		let token = req.headers.authorization
+		token = token.slice(7, token.length)
+		sellerId = auth.decode(token).id
+
+		
+		const result = await sellerController.authOwnership(sellerId, productId)
+
 		if(!result) {
-			res.send({result : "ERR"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : "OK"})
+			res.send({code : routeConstants.codeOK})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-router.get('/productsFromOrder', auth.verifySeller, (req,res) => {
-	let token = req.headers.authorization
-	token = token.slice(7, token.length)
-	sellerId = auth.decode(token).id
-	sellerController.getProductsFromOrder(sellerId).then(result => {
+router.get('/productsFromOrder', auth.verifySeller, async (req,res) => {
+
+	try{
+		let token = req.headers.authorization
+		token = token.slice(7, token.length)
+		sellerId = auth.decode(token).id
+		
+		const result = await sellerController.getProductsFromOrder(sellerId)
+
 		if(!result) {
-			res.send({result : "ERR"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
 
-router.post('/create', (req,res) => {
-	sellerController.createSeller(req.body).then(result => {
+router.post('/create', async (req,res) => {
+
+	try{
+		const result = await sellerController.createSeller(req.body)
+
 		if(!result) {
-			res.send({result : "Failed"})
+			res.send({code : routeConstants.codeERROR})
 		} else if(result === "AE"){
-			res.send({result : "EA"})
+			res.send({code : routeConstants.codeEXISTINGACCOUNT})
 		} else {
-			res.send({result : "OK"})
+			res.send({code : routeConstants.codeOK})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-router.post('/login', (req,res) => {
-	sellerController.login(req.body).then(result => {
+router.post('/login', async (req,res) => {
+
+	try{ 
+
+		const result = await sellerController.login(req.body)
+
 		if(!result || result == "CI") {
-			res.send({result : "WC"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
 
-router.get('/details', (req,res) => {
-	let token = req.headers.authorization
-	token = token.slice(7, token.length)
+router.get('/details', async (req,res) => {
+	try {
+		let token = req.headers.authorization
+		token = token.slice(7, token.length)
 
-	sellerController.getDetails(token).then(result => {
+		const result = await sellerController.getDetails(token)
+
 		if(!result) {
-			res.send({result : "NF"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-	})
+
+	}catch(err) {
+		res.send(err)
+	}
 })
 
 
-module.exports = router
+export default router

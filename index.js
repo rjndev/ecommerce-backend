@@ -1,17 +1,29 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const app = express()
-const router = express.Router()
-const dotenv = require('dotenv')
-const cors = require('cors')
+// const express = require('express')
+// const mongoose = require('mongoose')
+// const dotenv = require('dotenv')
+// const cors = require('cors')
 
+
+// //routes
+// const userRoutes = require('./routes/userRoutes')
+// const productRoutes = require('./routes/productRoutes')
+// const orderRoutes = require('./routes/orderRoutes')
+// const sellerRoutes  = require('./routes/sellerRoutes')
+
+import express from 'express'
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+import cors from 'cors'
 
 //routes
-const userRoutes = require('./routes/userRoutes')
-const productRoutes = require('./routes/productRoutes')
-const orderRoutes = require('./routes/orderRoutes')
-const sellerRoutes  = require('./routes/sellerRoutes')
+import userRoutes from './routes/userRoutes.js'
+import productRoutes from './routes/productRoutes.js'
+import orderRoutes from './routes/orderRoutes.js'
+import sellerRoutes from './routes/sellerRoutes.js'
 
+
+const router = express.Router()
+const app = express()
 const port = 4001
 
 dotenv.config()

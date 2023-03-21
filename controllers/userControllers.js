@@ -1,11 +1,11 @@
-const User = require('../models/User')
-const bcrypt = require('bcrypt')
-const auth = require('../middlewares/auth')
+import User from '../models/User.js'
+import bcrypt from 'bcrypt'
+import auth from '../middlewares/auth.js'
 
-module.exports.register = (data) => {
+const register = async (data) => {
 
-	return User.findOne({email : data.email}).then(result => {
-		//if there is existing email error
+	try {
+		const result = await User.findOne({email : data.email})
 
 		if(result){
 			return "EA"
@@ -24,13 +24,20 @@ module.exports.register = (data) => {
 				return false
 			})
 		}
-	})
+
+	}catch(err) {
+		return false
+	}
+	
 	
 }
 
 
-module.exports.login = (user) => {
-	return User.findOne({email : user.email}).then(result => {
+const login = async (user) => {
+
+	try {
+		const result =  await User.findOne({email : user.email})
+
 		const isPasswordCorrect = bcrypt.compareSync(user.password, result.password)
 
 		const data = {
@@ -41,21 +48,26 @@ module.exports.login = (user) => {
 
 		if(isPasswordCorrect) {
 			return {auth : auth.createAccessToken(data)}
-		}
-	}).catch(err => {
+	}
+	}catch(err) {
 		return false
-	})
-}
+	}
 
-module.exports.getAllUsers = () => {
-	return User.find({}).then(result => {
+	
+}
+const getAllUsers = async () => {
+
+	try {
+		const result = await User.find({})
 		return result
-	}).catch(err => {
+	}catch(err) {
 		return false
-	})
+	}
+
+	
 }
 
-module.exports.getUserDetails = async (token) => {
+const getUserDetails = async (token) => {
 	const authPayload = auth.decode(token)
 
 	try {
@@ -69,7 +81,7 @@ module.exports.getUserDetails = async (token) => {
 }
 
 
-module.exports.setAsAdmin = async (id) => {
+const setAsAdmin = async (id) => {
 
 	try {
 		let result = await User.findByIdAndUpdate({_id : id}, {isAdmin : true})
@@ -79,4 +91,12 @@ module.exports.setAsAdmin = async (id) => {
 		return false
 	}
 
+}
+
+export default {
+	setAsAdmin,
+	getUserDetails,
+	getAllUsers,
+	login,
+	register
 }

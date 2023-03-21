@@ -1,8 +1,8 @@
-const Seller = require('../models/Seller')
-const Product = require('../models/Product')
-const bcrypt = require('bcrypt')
-const auth = require('../middlewares/auth')
-const Order = require('../models/Order')
+import Seller from '../models/Seller.js'
+import Product from '../models/Product.js'
+import bcrypt from 'bcrypt'
+import auth from '../middlewares/auth.js'
+import Order from '../models/Order.js'
 
 
 const hasDuplicate = (id, orders) => {
@@ -16,7 +16,7 @@ const hasDuplicate = (id, orders) => {
 	return false
 }
 
-module.exports.getProductsFromOrder = async(sellerId) => {
+const getProductsFromOrder = async(sellerId) => {
 	try { 
 
 		const seller = await Seller.findById(sellerId).populate('products').exec()
@@ -70,7 +70,7 @@ module.exports.getProductsFromOrder = async(sellerId) => {
 }
 
 
-module.exports.getProducts = async (sellerId) => {
+const getProducts = async (sellerId) => {
 	try {
 		let foundSeller = await Seller.findById(sellerId).populate('products').exec()
 		
@@ -84,7 +84,7 @@ module.exports.getProducts = async (sellerId) => {
 }
 
 
-module.exports.authOwnership = async (sellerId, productId) => {
+const authOwnership = async (sellerId, productId) => {
 	try {
 		const foundProduct = await Product.findById(productId)
 
@@ -103,7 +103,7 @@ module.exports.authOwnership = async (sellerId, productId) => {
 	}
 }
 
-module.exports.getDetails = async (token) => {
+const getDetails = async (token) => {
 	try { 
 		const authPayload = auth.decode(token)
 
@@ -117,7 +117,7 @@ module.exports.getDetails = async (token) => {
 	}
 }
 
-module.exports.login = async (body) => {
+const login = async (body) => {
 	try {
 		const result = await Seller.findOne({email : body.email})
 
@@ -146,7 +146,7 @@ module.exports.login = async (body) => {
 	}
 }
 
-module.exports.createSeller = async (body) => {
+const createSeller = async (body) => {
 	try {
 		const resultEmail = await Seller.findOne({email : body.email})
 		const resultName = await Seller.findOne({storeName : body.storeName})
@@ -169,4 +169,15 @@ module.exports.createSeller = async (body) => {
 		console.log(err)
 		return false
 	}
+}
+
+export default { 
+	createSeller,
+	login,
+	getDetails,
+	authOwnership,
+	getProducts,
+	getProductsFromOrder,
+	hasDuplicate
+
 }

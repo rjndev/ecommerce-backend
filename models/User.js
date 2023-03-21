@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import dbConstants from '../dbConstants.js'
 
 const userSchema =  mongoose.Schema({
 	firstName : {
@@ -28,4 +29,4 @@ const userSchema =  mongoose.Schema({
 })
 
 
-module.exports = mongoose.model("User", userSchema)
+export default mongoose.model(dbConstants.userString, userSchema)

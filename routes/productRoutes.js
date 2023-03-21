@@ -1,98 +1,122 @@
-const express = require('express')
+import express from 'express'
+import auth from '../middlewares/auth.js'
+import productControllers from '../controllers/productControllers.js'
+import sellerController from '../controllers/sellerControllers.js'
+import routeConstants from '../routeConstants.js'
+
+
 const router = express.Router()
-const auth = require('../middlewares/auth')
-const productControllers = require('../controllers/productControllers')
-const sellerController = require('../controllers/sellerControllers')
-
-
 
 //*ADMIN Protected Routes
 //Create a new Product Route
-router.post('/create', auth.verify, auth.verifySeller, (req,res)=> {
+router.post('/create', auth.verify, auth.verifySeller, async (req,res)=> {
 	
-	let token = req.headers.authorization
-	token = token.slice(7,token.length)
+	try {
+		let token = req.headers.authorization
+		token = token.slice(7,token.length)
 
-	let sellerId = auth.decode(token).id
-	productControllers.createProduct(sellerId, req.body).then(result => {
+		let sellerId = auth.decode(token).id
+
+		const result = await productControllers.createProduct(sellerId, req.body)
+
 		if(result?.error) {
-			res.send({result : "ERROR"})
+			res.send({code : routeConstants.codeERROR})
 		} else if(result == false){
-			res.send({result : "EP"})
+			res.send({code : routeConstants.codeEXISTINGPRODUCT})
 		} else {
-			res.send({result : "OK"})
+			res.send({code : routeConstants.codeOK})
 		}
-	})
+	} catch(err) {
+		res.send(err)
+	}
 })
 
 //GET all product details including non active
-router.get('/details/all', auth.verify, auth.verifyAdmin, (req,res)=> {
-	productControllers.getAllProducts().then(result => {
+router.get('/details/all', auth.verify, auth.verifyAdmin, async (req,res)=> {
+
+	try {
+		const result = await productControllers.getAllProducts()
+
 		if(!result) {
-			res.send({result : "failed"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({ code : routeConstants.codeOK ,result })
 		}
-	})
+	}catch(err){
+		res.send(err)
+	}
 })
 
-router.post('/details/random', (req, res) => {
-	productControllers.getRandomProducts(req.body.size).then(result => {
+router.post('/details/random', async (req, res) => {
+
+	try{ 
+		const result = await productControllers.getRandomProducts(req.body.size)
+
 		if(!result) {
-			res.send({result : "failed"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-	})
-	
+	} catch(err) {
+		res.send(err)
+	}
 })
 
-router.get('/search/:searchText', (req, res) => {
-	productControllers.searchProduct(req.params.searchText).then(result => {
+router.get('/search/:searchText', async (req, res) => {
+
+	try{
+		const result = await productControllers.searchProduct(req.params.searchText)
+
 		if(!result) {
-			res.send({result : "failed"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-
-
-	})
-
-
+	}catch(err) {
+		res.send(err)
+	}
 }) 
 
 //UPDATE product information
-router.put('/details/:id/update', auth.verify, auth.verifySeller, (req,res)=>{ 
-	let token = req.headers.authorization
-	token = token.slice(7,token.length)
-	sellerId = auth.decode(token).id
+router.put('/details/:id/update', auth.verify, auth.verifySeller, async (req,res)=>{ 
 
-	sellerController.authOwnership(sellerId, req.params.id).then(result => {
+	try{
+		let token = req.headers.authorization
+		token = token.slice(7,token.length)
+		sellerId = auth.decode(token).id
+
+		const result = await sellerController.authOwnership(sellerId, req.params.id)
+
+
 		if(!result) {
-			res.send({result : "failed auth"})
+			res.send({code : routeConstants.codeFAILEDAUTH})
 		} else {
 			productControllers.updateProduct(req.params.id, req.body, sellerId).then(result2=> {
 
 				if(!result2) {
-					res.status(500).send({result : "failed"})
+					res.status(500).send({code : routeConstants.codeERROR})
 				} else {
-					res.send({result : "OK"})
+					res.send({code : routeConstants.codeOK})
 				}
 			})
 		}
-	})
-	
-	
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-router.put('/details/:id/archive', auth.verify, auth.verifyAdmin, (req,res) => {
-	productControllers.archiveProduct(req.params.id).then(result => {
+router.put('/details/:id/archive', auth.verify, auth.verifyAdmin, async (req,res) => {
+	try {
+		const result = await productControllers.archiveProduct(req.params.id)
+
 		if(!result) {
-			res.status(500).send({result : "failed"})
+			res.status(500).send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : "OK"})
+			res.send({code : routeConstants.codeOK , result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
 
@@ -100,54 +124,71 @@ router.put('/details/:id/archive', auth.verify, auth.verifyAdmin, (req,res) => {
 //*NON PROTECTED
 
 
-router.get('/details/active', (req,res)=> {
-	productControllers.getActiveProducts().then(result => {
+router.get('/details/active', async (req,res)=> {
+	try{
+		const result = await productControllers.getActiveProducts()
+
 		if(!result) {
-			res.send({result : "failedezzz"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-router.get('/categories/category', (req,res) => {
-	productControllers.getCategory(req.body).then(result => {
+router.get('/categories/category', async (req,res) => {
+	try{
+		const result = await productControllers.getCategory(req.body)
 		if(!result) {
-			res.status(500).send({result : "failed"})
+			res.status(500).send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.OK ,result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-router.get('/categories/all' , (req,res) => {
-	productControllers.getAllCategories().then(result => {
+router.get('/categories/all' , async (req,res) => {
+	try{
+		const result = await productControllers.getAllCategories()
+
 		if(!result) {
-			res.status(500).send({result : "failed"})
+			res.status(500).send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code: routeConstants.codeOK , result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-router.get('/categories/:name', (req,res) => {
-	productControllers.getProductsInCategory({name: req.params.name}).then(result => {
+router.get('/categories/:name', async (req,res) => {
+	try {
+		const result = await productControllers.getProductsInCategory({name: req.params.name})
 		if(!result) {
-			res.send({result : "failed"})
+			res.send({code : routeConstants.codeERROR})
 		} else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-router.get('/details/:id', (req,res) => {
-	productControllers.getProduct(req.params.id).then(result => {
+router.get('/details/:id', async (req,res) => {
+	try {
+		const result = await productControllers.getProduct(req.params.id)
 		if(!result) {
-			res.send({result : "failed"})
+			res.send({code : routeConstants.codeERROR})
 		}else {
-			res.send({result : result})
+			res.send({code : routeConstants.codeOK ,result})
 		}
-	})
+	}catch(err) {
+		res.send(err)
+	}
 })
 
-module.exports = router
+export default router
