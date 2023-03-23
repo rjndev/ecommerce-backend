@@ -100,6 +100,8 @@ const getUserOrders = async (id) => {
 		const allOrders = await Order.find()
 		const allProducts = await Product.find()
  		
+		console.log("USER DETAILS" + user)
+
 		const userOrder = await Order.findById(user.currentOrders).populate('productDetails').exec()
 		
 		// userOrder.products.forEach(product => {
@@ -153,7 +155,7 @@ const addToCart = async (id, data) => {
 		}else {
 
 			console.log("NO ORDER FOUND CREATING ORDER..")
-			const result =await module.exports.createOrder(id, {products : [data]})
+			const result = await createOrder(id, {products : [data]})
 			if(result) 
 				return true
 			else return false

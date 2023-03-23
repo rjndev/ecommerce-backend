@@ -94,6 +94,7 @@ router.get('/myOrders', auth.verify, auth.verifyNotAdmin, async (req,res) => {
 		const userId = auth.decode(token).id
 
 		console.log('sending orders!')
+		console.log('userid ' + userId)
 		const result = await orderControllers.getUserOrders(userId)
 		if(!result) {
 			res.send({code : routeConstants.codeERROR})

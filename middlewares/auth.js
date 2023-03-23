@@ -81,7 +81,7 @@ const verifyNotAdmin = (req,res,next) => {
 	let token = req.headers.authorization
 	token = token.slice(7, token.length)
 
-	let data = module.exports.decode(token)
+	let data = decode(token)
 
 	if(!data.isAdmin) {
 		return next()

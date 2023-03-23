@@ -19,9 +19,7 @@ router.post('/create', auth.verify, auth.verifySeller, async (req,res)=> {
 
 		const result = await productControllers.createProduct(sellerId, req.body)
 
-		if(result?.error) {
-			res.send({code : routeConstants.codeERROR})
-		} else if(result == false){
+		if(result == false){
 			res.send({code : routeConstants.codeEXISTINGPRODUCT})
 		} else {
 			res.send({code : routeConstants.codeOK})
